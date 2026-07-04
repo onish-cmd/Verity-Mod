@@ -1,31 +1,30 @@
 package com.onish.verity.client;
 
 import com.onish.verity.entity.VerityCompanionEntity;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
-import net.onish.verity.entity.VerityCompanionEntity;
 import org.joml.Matrix4f;
 
 public class VerityClientMod implements ClientModInitializer {
-
     public static final String MOD_ID = "verity";
 
     @Override
     public void onInitializeClient() {
-        // Entity renderer registration will go here
+        EntityRendererRegistry.register(
+            net.minecraft.world.entity.EntityType.byString(MOD_ID + ":verity_companion").orElseThrow(),
+            CircleCompanionRenderer::new
+        );
     }
 
-    public static class CircleCompanionRenderer extends EntityRenderer<VerityCompanionEntity> {
-        private static final ResourceLocation TEXTURE = 
-                ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/item/default.png");
+    public static class CircleCompanionRenderer extends EntityRenderer<VerityCompanionEntity, EntityRenderer.State> {
+        private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/default.png");
 
         public CircleCompanionRenderer(EntityRendererProvider.Context context) {
             super(context);
@@ -37,48 +36,29 @@ public class VerityClientMod implements ClientModInitializer {
         }
 
         @Override
-        public void render(VerityCompanionEntity entity, float entityYaw, float partialTicks,
-                           PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-
+        public void render(VerityCompanionEntity entity, EntityRenderer.State state, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
             poseStack.pushPose();
-
-            // Face the camera (Billboard)
-            poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-
-            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(getTextureLocation(entity)));
             
-            PoseStack.Pose lastPose = poseStack.last();
-            Matrix4f matrix = lastPose.pose();
+            poseStack.translate(0.0D, 0.5D, 0.0D);
+            
+            poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+            
+            VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(getTextureLocation(entity)));
+            Matrix4f matrix = poseStack.last().pose();
 
-            float radius = 0.5f;
-            int segments = 32;
-
-            vertexConsumer.addVertex(matrix, 0, 0, 0)
-                    .setColor(255, 255, 255, 255)
-                    .setUv(0.5f, 0.5f)
-                    .setOverlay(0)
-                    .setLight(packedLight)
-                    .setNormal(lastPose, 0, 0, 1);
-
-            for (int i = 0; i <= segments; i++) {
-                float angle = (float) (i * 2 * Math.PI / segments);
-                float x = (float) (Math.cos(angle) * radius);
-                float y = (float) (Math.sin(angle) * radius);
-
-                float u = 0.5f + (float) (Math.cos(angle) * 0.5f);
-                float v = 0.5f - (float) (Math.sin(angle) * 0.5f);
-
-                vertexConsumer.addVertex(matrix, x, y, 0)
-                        .setColor(255, 255, 255, 255)
-                        .setUv(u, v)
-                        .setOverlay(0)
-                        .setLight(packedLight)
-                        .setNormal(lastPose, 0, 0, 1);
-            }
+            float size = 0.5F;            
+            consumer.addVertex(matrix, -size, -size, 0.0F).setColor(255, 255, 255, 255).setUv(0.0F, 1.0F).setLightmap(packedLight);
+            consumer.addVertex(matrix, size, -size, 0.0F).setColor(255, 255, 255, 255).setUv(1.0F, 1.0F).setLightmap(packedLight);
+            consumer.addVertex(matrix, size, size, 0.0F).setColor(255, 255, 255, 255).setUv(1.0F, 0.0F).setLightmap(packedLight);
+            consumer.addVertex(matrix, -size, size, 0.0F).setColor(255, 255, 255, 255).setUv(0.0F, 0.0F).setLightmap(packedLight);
 
             poseStack.popPose();
-            super.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+            super.render(entity, state, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+        }
+
+        @Override
+        public EntityRenderer.State createRenderState() {
+            return new EntityRenderer.State();
         }
     }
 }
