@@ -1,44 +1,30 @@
-name: Build Verity Mod
+# Automatically build the project and run any configured tests for every push
+# and submitted pull request. This can help catch issues that only occur on
+# certain platforms or Java versions, and provides a first line of defence
+# against bad commits.
 
-on:
-  push:
-    branches: ["main", "master"]
-  pull_request:
-    branches: ["main", "master"]
-  workflow_dispatch:
+name: build
+on: [pull_request, push]
+
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-24.04
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+      - name: checkout repository
+        uses: actions/checkout@v6
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+      - name: setup jdk
+        uses: actions/setup-java@v5
         with:
-          java-version: "21"
-          distribution: "temurin"
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Make Gradle Wrapper Executable
-        run: chmod +x gradlew
-
-      - name: Setup Loom Workspace Configurations
-        run: ./gradlew downloadAssets --refresh-dependencies
-
-      - name: Generate Minecraft Sources
-        run: ./gradlew genSources
-
-
-      - name: Compile Mod JAR
+          java-version: '25'
+          distribution: 'microsoft'
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: build
         run: ./gradlew build
-  
-
-      - name: Upload Compiled Mod Artifact
-        uses: actions/upload-artifact@v4
+      - name: capture build artifacts
+        uses: actions/upload-artifact@v7
         with:
-          name: verity-compiled-jar
-          path: build/libs/*.jar
+          name: Artifacts
+          path: build/libs/
