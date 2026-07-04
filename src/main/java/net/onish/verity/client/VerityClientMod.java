@@ -18,7 +18,7 @@ public class VerityClientMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        // Entity renderer registration handles cleanly here
+        // Entity renderer registration will go here
     }
 
     public static class CircleCompanionRenderer extends EntityRenderer<VerityCompanionEntity> {
@@ -40,11 +40,12 @@ public class VerityClientMod implements ClientModInitializer {
 
             poseStack.pushPose();
 
-            // Face the camera using the context dispatcher data wrapper mapping
+            // Face the camera (Billboard)
             poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
 
             VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(getTextureLocation(entity)));
+            
             PoseStack.Pose lastPose = poseStack.last();
             Matrix4f matrix = lastPose.pose();
 
