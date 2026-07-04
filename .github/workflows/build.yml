@@ -27,7 +27,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Setup Loom Workspace Configurations
-        run: ./gradlew migrateMappings vscode idea
+        run: ./gradlew downloadAssets --refresh-dependencies
 
       - name: Generate Minecraft Sources
         run: ./gradlew genSources
