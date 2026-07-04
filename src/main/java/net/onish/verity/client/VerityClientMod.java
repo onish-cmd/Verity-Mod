@@ -18,7 +18,7 @@ public class VerityClientMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        // Your entity renderer registration will go here
+        // Entity renderer registration handles cleanly here
     }
 
     public static class CircleCompanionRenderer extends EntityRenderer<VerityCompanionEntity> {
@@ -40,7 +40,7 @@ public class VerityClientMod implements ClientModInitializer {
 
             poseStack.pushPose();
 
-            // Face the camera (Billboard)
+            // Face the camera using the context dispatcher data wrapper mapping
             poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
 
@@ -55,7 +55,7 @@ public class VerityClientMod implements ClientModInitializer {
                     .setColor(255, 255, 255, 255)
                     .setUv(0.5f, 0.5f)
                     .setOverlay(0)
-                    .setLight=packedLight
+                    .setLight(packedLight)
                     .setNormal(lastPose, 0, 0, 1);
 
             for (int i = 0; i <= segments; i++) {
@@ -70,7 +70,7 @@ public class VerityClientMod implements ClientModInitializer {
                         .setColor(255, 255, 255, 255)
                         .setUv(u, v)
                         .setOverlay(0)
-                        .setLight=packedLight
+                        .setLight(packedLight)
                         .setNormal(lastPose, 0, 0, 1);
             }
 
