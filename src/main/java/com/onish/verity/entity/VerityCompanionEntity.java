@@ -1,4 +1,4 @@
-package net.onish.verity.entity;
+package com.onish.verity.entity;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;

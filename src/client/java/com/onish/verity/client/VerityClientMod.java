@@ -1,4 +1,6 @@
-package net.onish.verity.client;
+package com.onish.verity.client;
+
+import com.onish.verity.entity.VerityCompanionEntity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
