@@ -32,6 +32,11 @@ jobs:
       - name: Generate Minecraft Sources
         run: ./gradlew genSources
 
+
+      - name: Compile Mod JAR
+        run: ./gradlew build
+  
+
       - name: Upload Compiled Mod Artifact
         uses: actions/upload-artifact@v4
         with:
